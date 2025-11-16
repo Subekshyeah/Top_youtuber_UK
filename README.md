@@ -748,53 +748,48 @@ Best option from category: Mister Max
 #### SQL query 
 ```sql
 /*
-# 1. Define variables
-# 2. Create a CTE that rounds the average views per video
-# 3. Select the columns you need and create calculated columns from existing ones
-# 4. Filter results by YouTube channels
-# 5. Sort results by net profits (from highest to lowest)
-*/
+-- 1. Variable Declaration (MySQL uses SET @variable_name)
+SET @conversionRate = 0.02;
+SET @productCost = 5.00;
+SET @campaignCost = 50000.00;
 
-
-
--- 1.
-DECLARE @conversionRate FLOAT = 0.02;        -- The conversion rate @ 2%
-DECLARE @productCost MONEY = 5.0;            -- The product cost @ $5
-DECLARE @campaignCost MONEY = 130000.0;      -- The campaign cost @ $130,000
-
-
-
--- 2.
+-- 2. Common Table Expression (CTE) - supported in MySQL 8.0+
 WITH ChannelData AS (
-    SELECT
-        channel_name,
-        total_views,
-        total_videos,
-        ROUND(CAST(total_views AS FLOAT) / total_videos, -4) AS avg_views_per_video
-    FROM
-        youtube_db.dbo.view_uk_youtubers_2024
+SELECT
+    -- Fix 1: Added TRIM() to ensure channel names match correctly
+    TRIM(channel_name) AS channel_name,
+    total_views,
+    total_videos,
+    
+    -- Fix 2: Changed CAST to high-precision DECIMAL(38, 4) 
+    -- to prevent calculation errors/overflows when working with large numbers
+    ROUND((CAST(total_views AS DECIMAL(38, 4)) / total_videos) / 10000) * 10000 AS rounded_avg_views_per_video,
+    
+    -- Ensuring original average is also calculated with high precision
+    CAST(total_views AS DECIMAL(38, 4)) / total_videos AS original_avg_views_per_video
+FROM
+    top_youtuber.view_uk_youtubers_2024
 )
 
+-- SELECT *
+-- FROM ChannelData
+-- WHERE channel_name IN ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes');
 
--- 3.
-SELECT
-    channel_name,
-    avg_views_per_video,
-    (avg_views_per_video * @conversionRate) AS potential_units_sold_per_video,
-    (avg_views_per_video * @conversionRate * @productCost) AS potential_revenue_per_video,
-    (avg_views_per_video * @conversionRate * @productCost) - @campaignCost AS net_profit
-FROM
-    ChannelData
-
+-- The SELECT statement remains the same, but now it matches clean data
+ SELECT 
+	channel_name,
+	rounded_avg_views_per_video,
+    round((rounded_avg_views_per_video * @conversionRate)) as potential_units_sold_per_video,
+    round((rounded_avg_views_per_video * @conversionRate * @productCost)) as potential_revenue_per_video,
+    round((rounded_avg_views_per_video * @conversionRate * @productCost) - @campaignCost) as net_profit
+FROM ChannelData
 
 -- 4.
-WHERE
-    channel_name IN ('Mister Max', 'DanTDM', 'Dan Rhodes')
-
+WHERE channel_name IN ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes')
 
 -- 5.
 ORDER BY
-    net_profit DESC;
+	net_profit DESC;
 
 ```
 
