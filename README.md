@@ -116,7 +116,7 @@ Some of the data visuals that may be appropriate in answering our questions incl
 | Tool | Purpose |
 | --- | --- |
 | Excel | Exploring the data |
-| SQL Server | Cleaning, testing, and analyzing the data |
+| MySQL | Cleaning, testing, and analyzing the data |
 | Power BI | Visualizing the data via interactive dashboards |
 | GitHub | Hosting the project documentation and version control |
 | Mokkup AI | Designing the wireframe/mockup of the dashboard | 
@@ -130,7 +130,7 @@ Some of the data visuals that may be appropriate in answering our questions incl
 
 1. Get the data
 2. Explore the data in Excel
-3. Load the data into SQL Server
+3. Load the data into MySQL
 4. Clean the data with SQL
 5. Test the data with SQL
 6. Visualize the data in Power BI
@@ -207,17 +207,16 @@ And here is a tabular representation of the expected schema for the clean data:
 
 -- 1.
 SELECT
-    SUBSTRING(NOMBRE, 1, CHARINDEX('@', NOMBRE) -1) AS channel_name,  -- 2.
+    SUBSTRING(NOMBRE, 1, LOCATE('@', NOMBRE) - 1) AS channel_name,  -- 2.
     total_subscribers,
     total_views,
     total_videos
-
 FROM
-    top_uk_youtubers_2024
+    top_uk_youtubers_2024;
 ```
 
 
-### Create the SQL view 
+### Create the SQL View 
 
 ```sql
 /*
@@ -231,15 +230,14 @@ CREATE VIEW view_uk_youtubers_2024 AS
 
 -- 2.
 SELECT
-    CAST(SUBSTRING(NOMBRE, 1, CHARINDEX('@', NOMBRE) -1) AS VARCHAR(100)) AS channel_name, -- 2. 
+    CAST(SUBSTRING(NOMBRE, 1, LOCATE('@', NOMBRE) - 1) AS CHAR(100)) AS channel_name, -- 2. 
     total_subscribers,
     total_views,
     total_videos
 
 -- 3.
 FROM
-    top_uk_youtubers_2024
-
+    top_uk_youtubers_2024;
 ```
 
 
@@ -259,7 +257,6 @@ SELECT
     COUNT(*) AS no_of_rows
 FROM
     view_uk_youtubers_2024;
-
 ```
 
 
@@ -270,13 +267,12 @@ FROM
 # Count the total number of columns (or fields) are in the SQL view
 */
 
-
 SELECT
     COUNT(*) AS column_count
 FROM
     INFORMATION_SCHEMA.COLUMNS
 WHERE
-    TABLE_NAME = 'view_uk_youtubers_2024'
+    TABLE_NAME = 'view_uk_youtubers_2024';
 ```
 ### Output 
 
@@ -346,7 +342,6 @@ VAR sumOfSubscribers = SUM(view_uk_youtubers_2024[total_subscribers])
 VAR totalSubscribers = DIVIDE(sumOfSubscribers,million)
 
 RETURN totalSubscribers
-
 ```
 
 ### 2. Total Views (B)
@@ -357,7 +352,6 @@ VAR sumOfTotalViews = SUM(view_uk_youtubers_2024[total_views])
 VAR totalViews = ROUND(sumOfTotalViews / billion, 2)
 
 RETURN totalViews
-
 ```
 
 ### 3. Total Videos
@@ -366,7 +360,6 @@ Total Videos =
 VAR totalVideos = SUM(view_uk_youtubers_2024[total_videos])
 
 RETURN totalVideos
-
 ```
 
 ### 4. Average Views Per Video (M)
@@ -378,7 +371,6 @@ VAR  avgViewsPerVideo = DIVIDE(sumOfTotalViews,sumOfTotalVideos, BLANK())
 VAR finalAvgViewsPerVideo = DIVIDE(avgViewsPerVideo, 1000000, BLANK())
 
 RETURN finalAvgViewsPerVideo 
-
 ```
 
 
@@ -390,7 +382,6 @@ VAR sumOfTotalVideos = SUM(view_uk_youtubers_2024[total_videos])
 VAR subscriberEngRate = DIVIDE(sumOfTotalSubscribers, sumOfTotalVideos, BLANK())
 
 RETURN subscriberEngRate 
-
 ```
 
 
@@ -402,7 +393,6 @@ VAR sumOfTotalSubscribers = SUM(view_uk_youtubers_2024[total_subscribers])
 VAR viewsPerSubscriber = DIVIDE(sumOfTotalViews, sumOfTotalSubscribers, BLANK())
 
 RETURN viewsPerSubscriber 
-
 ```
 
 
@@ -427,72 +417,72 @@ Here are the key questions we need to answer for our marketing client:
 
 ### 1. Who are the top 10 YouTubers with the most subscribers?
 
-Rank,Channel Name,Subscribers (M),Original Rank
-1,NoCopyrightSounds,34.10,1
-2,DanTDM,29.20,2
-3,Dan Rhodes,26.60,3
-4,Miss Katy,25.50,4
-5,Mister Max,25.10,5
-6,KSI Music,25.00,6
-7,Dua Lipa,24.40,8
-8,Jelly,23.40,7
-9,Ali-A,19.70,10
-10,Sidemen,18.60,9
+| Rank | Channel Name | Subscribers (M) |
+|------|--------------|-----------------|
+| 1    | NoCopyrightSounds | 34.10 |
+| 2    | DanTDM | 29.20 |
+| 3    | Dan Rhodes | 26.60 |
+| 4    | Miss Katy | 25.50 |
+| 5    | Mister Max | 25.10 |
+| 6    | KSI Music | 25.00 |
+| 7    | Dua Lipa | 24.40 |
+| 8    | Jelly | 23.40 |
+| 9    | Mrwhosetheboss | 21.60 |
+| 10   | Ali-A | 19.70 |
 
 
 ### 2. Which 3 channels have uploaded the most videos?
 
-| Rank | Channel Name    | Videos Uploaded |
-|------|-----------------|-----------------|
-| 1    | GRM Daily       | 14,696          |
-| 2    | Manchester City | 8,248           |
-| 3    | Yogscast        | 6,435           |
+| Rank | Channel Name | Videos Uploaded |
+|------|--------------|-----------------|
+| 1    | GRM Daily | 15,448 |
+| 2    | Man City | 9,638 |
+| 3    | YOGSCAST Lewis & Simon | 7,317 |
 
 
 
 ### 3. Which 3 channels have the most views?
 
-
 | Rank | Channel Name | Total Views (B) |
 |------|--------------|-----------------|
-| 1    | DanTDM       | 19.78           |
-| 2    | Dan Rhodes   | 18.56           |
-| 3    | Mister Max   | 15.97           |
+| 1    | DanTDM | 20.24 |
+| 2    | Dan Rhodes | 19.21 |
+| 3    | Mister Max | 16.55 |
 
 
 ### 4. Which 3 channels have the highest average views per video?
 
-| Channel Name | Averge Views per Video (M) |
-|--------------|-----------------|
-| Mark Ronson  | 32.27           |
-| Jessie J     | 5.97            |
-| Dua Lipa     | 5.76            |
+| Rank | Channel Name | Average Views per Video (M) |
+|------|--------------|----------------------------|
+| 1    | Mark Ronson | 361.06 |
+| 2    | Jessie J | 26.01 |
+| 3    | The Beatles | 22.07 |
 
 
 ### 5. Which 3 channels have the highest views per subscriber ratio?
 
-| Rank | Channel Name       | Views per Subscriber        |
-|------|-----------------   |---------------------------- |
-| 1    | GRM Daily          | 1185.79                     |
-| 2    | Nickelodeon        | 1061.04                     |
-| 3    | Disney Junior UK   | 1031.97                     |
+| Rank | Channel Name | Views per Subscriber |
+|------|--------------|---------------------|
+| 1    | GRM Daily | 1,220.94 |
+| 2    | Nickelodeon UK | 1,069.27 |
+| 3    | Disney Kids | 1,607.07 |
 
 
 
 ### 6. Which 3 channels have the highest subscriber engagement rate per video uploaded?
 
-| Rank | Channel Name    | Subscriber Engagement Rate  |
-|------|-----------------|---------------------------- |
-| 1    | Mark Ronson     | 343,000                     |
-| 2    | Jessie J        | 110,416.67                  |
-| 3    | Dua Lipa        | 104,954.95                  |
+| Rank | Channel Name | Subscriber Engagement Rate |
+|------|--------------|---------------------------|
+| 1    | Mark Ronson | 357,500 |
+| 2    | Jessie J | 45,188.28 |
+| 3    | Dua Lipa | 76,972.56 |
 
 
 
 
 ### Notes
 
-For this analysis, we'll prioritize analysing the metrics that are important in generating the expected ROI for our marketing client, which are the YouTube channels wuth the most 
+For this analysis, we'll prioritize analysing the metrics that are important in generating the expected ROI for our marketing client, which are the YouTube channels with the most:
 
 - subscribers
 - total views
@@ -508,32 +498,29 @@ For this analysis, we'll prioritize analysing the metrics that are important in 
 
 Campaign idea = product placement 
 
-1. NoCopyrightSounds 
-- Average views per video = 6.92 million
+a. NoCopyrightSounds 
+- Average views per video = 5.97 million
 - Product cost = $5
-- Potential units sold per video = 6.92 million x 2% conversion rate = 138,400 units sold
-- Potential revenue per video = 138,400 x $5 = $692,000
+- Potential units sold per video = 5.97 million x 2% conversion rate = 119,400 units sold
+- Potential revenue per video = 119,400 x $5 = $597,000
 - Campaign cost (one-time fee) = $50,000
-- **Net profit = $692,000 - $50,000 = $642,000**
+- **Net profit = $597,000 - $50,000 = $547,000**
 
 b. DanTDM
-
-- Average views per video = 5.34 million
+- Average views per video = 5.37 million
 - Product cost = $5
-- Potential units sold per video = 5.34 million x 2% conversion rate = 106,800 units sold
-- Potential revenue per video = 106,800 x $5 = $534,000
+- Potential units sold per video = 5.37 million x 2% conversion rate = 107,400 units sold
+- Potential revenue per video = 107,400 x $5 = $537,000
 - Campaign cost (one-time fee) = $50,000
-- **Net profit = $534,000 - $50,000 = $484,000**
+- **Net profit = $537,000 - $50,000 = $487,000**
 
 c. Dan Rhodes
-
-- Average views per video = 11.15 million
+- Average views per video = 11.32 million
 - Product cost = $5
-- Potential units sold per video = 11.15 million x 2% conversion rate = 223,000 units sold
-- Potential revenue per video = 223,000 x $5 = $1,115,000
+- Potential units sold per video = 11.32 million x 2% conversion rate = 226,400 units sold
+- Potential revenue per video = 226,400 x $5 = $1,132,000
 - Campaign cost (one-time fee) = $50,000
-- **Net profit = $1,115,000 - $50,000 = $1,065,000**
-
+- **Net profit = $1,132,000 - $50,000 = $1,082,000**
 
 Best option from category: Dan Rhodes
 
@@ -542,21 +529,17 @@ Best option from category: Dan Rhodes
 
 ```sql
 /* 
-
 # 1. Define variables 
 # 2. Create a CTE that rounds the average views per video 
-# 3. Select the column you need and create calculated columns from existing ones 
-# 4. Filter results by Youtube channels
+# 3. Select the columns you need and create calculated columns from existing ones 
+# 4. Filter results by YouTube channels
 # 5. Sort results by net profits (from highest to lowest)
-
 */
 
-
 -- 1. 
-DECLARE @conversionRate FLOAT = 0.02;		-- The conversion rate @ 2%
-DECLARE @productCost FLOAT = 5.0;			-- The product cost @ $5
-DECLARE @campaignCost FLOAT = 50000.0;		-- The campaign cost @ $50,000	
-
+SET @conversionRate = 0.02;        -- The conversion rate @ 2%
+SET @productCost = 5.0;            -- The product cost @ $5
+SET @campaignCost = 50000.0;       -- The campaign cost @ $50,000
 
 -- 2.  
 WITH ChannelData AS (
@@ -564,9 +547,9 @@ WITH ChannelData AS (
         channel_name,
         total_views,
         total_videos,
-        ROUND((CAST(total_views AS FLOAT) / total_videos), -4) AS rounded_avg_views_per_video
+        ROUND((CAST(total_views AS DECIMAL(20,2)) / total_videos), -4) AS rounded_avg_views_per_video
     FROM 
-        youtube_db.dbo.view_uk_youtubers_2024
+        view_uk_youtubers_2024
 )
 
 -- 3. 
@@ -579,56 +562,50 @@ SELECT
 FROM 
     ChannelData
 
-
 -- 4. 
 WHERE 
-    channel_name in ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes')    
-
+    channel_name IN ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes')    
 
 -- 5.  
 ORDER BY
-	net_profit DESC
-
+    net_profit DESC;
 ```
 
 #### Output
 
-![Most subsc](assets/images/youtubers_with_the_most_subs.png)
+![Most subscribers](assets/images/youtubers_with_the_most_subs.png)
 
 ### 2. Youtubers with the most videos uploaded
 
-### Calculation breakdown 
+#### Calculation breakdown 
 
 Campaign idea = sponsored video series  
 
-1. GRM Daily
-- Average views per video = 510,000
+a. GRM Daily
+- Average views per video = 525,781
 - Product cost = $5
-- Potential units sold per video = 510,000 x 2% conversion rate = 10,200 units sold
-- Potential revenue per video = 10,200 x $5= $51,000
+- Potential units sold per video = 525,781 x 2% conversion rate = 10,516 units sold
+- Potential revenue per video = 10,516 x $5 = $52,580
 - Campaign cost (11-videos @ $5,000 each) = $55,000
-- **Net profit = $51,000 - $55,000 = -$4,000 (potential loss)**
+- **Net profit = $52,580 - $55,000 = -$2,420 (potential loss)**
 
-b. **Manchester City**
-
-- Average views per video = 240,000
+b. Man City
+- Average views per video = 275,026
 - Product cost = $5
-- Potential units sold per video = 240,000 x 2% conversion rate = 4,800 units sold
-- Potential revenue per video = 4,800 x $5= $24,000
+- Potential units sold per video = 275,026 x 2% conversion rate = 5,501 units sold
+- Potential revenue per video = 5,501 x $5 = $27,505
 - Campaign cost (11-videos @ $5,000 each) = $55,000
-- **Net profit = $24,000 - $55,000 = -$31,000 (potential loss)**
+- **Net profit = $27,505 - $55,000 = -$27,495 (potential loss)**
 
-b. **Yogscast**
-
-- Average views per video = 710,000
+c. YOGSCAST Lewis & Simon
+- Average views per video = 637,095
 - Product cost = $5
-- Potential units sold per video = 710,000 x 2% conversion rate = 14,200 units sold
-- Potential revenue per video = 14,200 x $5= $71,000
+- Potential units sold per video = 637,095 x 2% conversion rate = 12,742 units sold
+- Potential revenue per video = 12,742 x $5 = $63,710
 - Campaign cost (11-videos @ $5,000 each) = $55,000
-- **Net profit = $71,000 - $55,000 = $16,000 (profit)**
+- **Net profit = $63,710 - $55,000 = $8,710 (profit)**
 
-
-Best option from category: Yogscast
+Best option from category: YOGSCAST Lewis & Simon
 
 #### SQL query 
 ```sql
@@ -640,13 +617,11 @@ Best option from category: Yogscast
 # 5. Sort results by net profits (from highest to lowest)
 */
 
-
 -- 1.
-DECLARE @conversionRate FLOAT = 0.02;           -- The conversion rate @ 2%
-DECLARE @productCost FLOAT = 5.0;               -- The product cost @ $5
-DECLARE @campaignCostPerVideo FLOAT = 5000.0;   -- The campaign cost per video @ $5,000
-DECLARE @numberOfVideos INT = 11;               -- The number of videos (11)
-
+SET @conversionRate = 0.02;              -- The conversion rate @ 2%
+SET @productCost = 5.0;                  -- The product cost @ $5
+SET @campaignCostPerVideo = 5000.0;      -- The campaign cost per video @ $5,000
+SET @numberOfVideos = 11;                -- The number of videos (11)
 
 -- 2.
 WITH ChannelData AS (
@@ -654,11 +629,10 @@ WITH ChannelData AS (
         channel_name,
         total_views,
         total_videos,
-        ROUND((CAST(total_views AS FLOAT) / total_videos), -4) AS rounded_avg_views_per_video
+        ROUND((CAST(total_views AS DECIMAL(20,2)) / total_videos), -4) AS rounded_avg_views_per_video
     FROM
-        youtube_db.dbo.view_uk_youtubers_2024
+        view_uk_youtubers_2024
 )
-
 
 -- 3.
 SELECT
@@ -670,11 +644,9 @@ SELECT
 FROM
     ChannelData
 
-
 -- 4.
 WHERE
-    channel_name IN ('GRM Daily', 'Man City', 'YOGSCAST Lewis & Simon ')
-
+    channel_name IN ('GRM Daily', 'Man City', 'YOGSCAST Lewis & Simon')
 
 -- 5.
 ORDER BY
@@ -686,89 +658,81 @@ ORDER BY
 ![Most videos](assets/images/youtubers_with_the_most_videos.png)
 
 
-### 3.  Youtubers with the most views 
+### 3. Youtubers with the most views 
 
 #### Calculation breakdown
 
 Campaign idea = Influencer marketing 
 
 a. DanTDM
-
-- Average views per video = 5.34 million
+- Average views per video = 5.37 million
 - Product cost = $5
-- Potential units sold per video = 5.34 million x 2% conversion rate = 106,800 units sold
-- Potential revenue per video = 106,800 x $5 = $534,000
+- Potential units sold per video = 5.37 million x 2% conversion rate = 107,400 units sold
+- Potential revenue per video = 107,400 x $5 = $537,000
 - Campaign cost (3-month contract) = $130,000
-- **Net profit = $534,000 - $130,000 = $404,000**
+- **Net profit = $537,000 - $130,000 = $407,000**
 
 b. Dan Rhodes
-
-- Average views per video = 11.15 million
+- Average views per video = 11.32 million
 - Product cost = $5
-- Potential units sold per video = 11.15 million x 2% conversion rate = 223,000 units sold
-- Potential revenue per video = 223,000 x $5 = $1,115,000
+- Potential units sold per video = 11.32 million x 2% conversion rate = 226,400 units sold
+- Potential revenue per video = 226,400 x $5 = $1,132,000
 - Campaign cost (3-month contract) = $130,000
-- **Net profit = $1,115,000 - $130,000 = $985,000**
+- **Net profit = $1,132,000 - $130,000 = $1,002,000**
 
 c. Mister Max
-
-- Average views per video = 14.06 million
+- Average views per video = 13.65 million
 - Product cost = $5
-- Potential units sold per video = 14.06 million x 2% conversion rate = 281,200 units sold
-- Potential revenue per video = 281,200 x $5 = $1,406,000
+- Potential units sold per video = 13.65 million x 2% conversion rate = 273,000 units sold
+- Potential revenue per video = 273,000 x $5 = $1,365,000
 - Campaign cost (3-month contract) = $130,000
-- **Net profit = $1,406,000 - $130,000 = $1,276,000**
+- **Net profit = $1,365,000 - $130,000 = $1,235,000**
 
 Best option from category: Mister Max
 
-
-
 #### SQL query 
 ```sql
-/*
--- 1. Variable Declaration (MySQL uses SET @variable_name)
-SET @conversionRate = 0.02;
-SET @productCost = 5.00;
-SET @campaignCost = 50000.00;
+/* 
+# 1. Define variables 
+# 2. Create a CTE that rounds the average views per video 
+# 3. Select the columns you need and create calculated columns from existing ones 
+# 4. Filter results by YouTube channels
+# 5. Sort results by net profits (from highest to lowest)
+*/
 
--- 2. Common Table Expression (CTE) - supported in MySQL 8.0+
+-- 1. 
+SET @conversionRate = 0.02;        -- The conversion rate @ 2%
+SET @productCost = 5.0;            -- The product cost @ $5
+SET @campaignCost = 130000.0;      -- The campaign cost @ $130,000
+
+-- 2.  
 WITH ChannelData AS (
-SELECT
-    -- Fix 1: Added TRIM() to ensure channel names match correctly
-    TRIM(channel_name) AS channel_name,
-    total_views,
-    total_videos,
-    
-    -- Fix 2: Changed CAST to high-precision DECIMAL(38, 4) 
-    -- to prevent calculation errors/overflows when working with large numbers
-    ROUND((CAST(total_views AS DECIMAL(38, 4)) / total_videos) / 10000) * 10000 AS rounded_avg_views_per_video,
-    
-    -- Ensuring original average is also calculated with high precision
-    CAST(total_views AS DECIMAL(38, 4)) / total_videos AS original_avg_views_per_video
-FROM
-    top_youtuber.view_uk_youtubers_2024
+    SELECT 
+        channel_name,
+        total_views,
+        total_videos,
+        ROUND((CAST(total_views AS DECIMAL(20,2)) / total_videos), -4) AS rounded_avg_views_per_video
+    FROM 
+        view_uk_youtubers_2024
 )
 
--- SELECT *
--- FROM ChannelData
--- WHERE channel_name IN ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes');
+-- 3. 
+SELECT 
+    channel_name,
+    rounded_avg_views_per_video,
+    ROUND((rounded_avg_views_per_video * @conversionRate)) AS potential_units_sold_per_video,
+    ROUND((rounded_avg_views_per_video * @conversionRate * @productCost)) AS potential_revenue_per_video,
+    ROUND((rounded_avg_views_per_video * @conversionRate * @productCost) - @campaignCost) AS net_profit
+FROM 
+    ChannelData
 
--- The SELECT statement remains the same, but now it matches clean data
- SELECT 
-	channel_name,
-	rounded_avg_views_per_video,
-    round((rounded_avg_views_per_video * @conversionRate)) as potential_units_sold_per_video,
-    round((rounded_avg_views_per_video * @conversionRate * @productCost)) as potential_revenue_per_video,
-    round((rounded_avg_views_per_video * @conversionRate * @productCost) - @campaignCost) as net_profit
-FROM ChannelData
+-- 4. 
+WHERE 
+    channel_name IN ('DanTDM', 'Dan Rhodes', 'Mister Max')
 
--- 4.
-WHERE channel_name IN ('NoCopyrightSounds', 'DanTDM', 'Dan Rhodes')
-
--- 5.
+-- 5.  
 ORDER BY
-	net_profit DESC;
-
+    net_profit DESC;
 ```
 
 #### Output
@@ -781,13 +745,12 @@ ORDER BY
 
 - What did we learn?
 
-We discovered that 
+We discovered that:
 
-
-1. NoCopyrightSOunds, Dan Rhodes and DanTDM are the channnels with the most subscribers in the UK
-2. GRM Daily, Man City and Yogscast are the channels with the most videos uploaded
-3. DanTDM, Dan RHodes and Mister Max are the channels with the most views
-4. Entertainment channels are useful for broader reach, as the channels posting consistently on their platforms and generating the most engagement are focus on entertainment and music 
+1. NoCopyrightSounds, DanTDM and Dan Rhodes are the channels with the most subscribers in the UK
+2. GRM Daily, Man City and YOGSCAST Lewis & Simon are the channels with the most videos uploaded
+3. DanTDM, Dan Rhodes and Mister Max are the channels with the most views
+4. Entertainment channels are useful for broader reach, as the channels posting consistently on their platforms and generating the most engagement are focused on entertainment and music 
 
 
 
@@ -796,19 +759,19 @@ We discovered that
 
 - What do you recommend based on the insights gathered? 
   
-1. Dan Rhodes is the best YouTube channel to collaborate with if we want to maximize visbility because this channel has the most YouTube subscribers in the UK
-2. Although GRM Daily, Man City and Yogcasts are regular publishers on YouTube, it may be worth considering whether collaborating with them with the current budget caps are worth the effort, as the potential return on investments is significantly lower compared to the other channels.
+1. Dan Rhodes is the best YouTube channel to collaborate with if we want to maximize visibility because this channel has the most YouTube subscribers in the UK
+2. Although GRM Daily, Man City and YOGSCAST Lewis & Simon are regular publishers on YouTube, it may be worth considering whether collaborating with them with the current budget caps are worth the effort, as the potential return on investments is significantly lower compared to the other channels.
 3. Mister Max is the best YouTuber to collaborate with if we're interested in maximizing reach, but collaborating with DanTDM and Dan Rhodes may be better long-term options considering the fact that they both have large subscriber bases and are averaging significantly high number of views.
-4. The top 3 channels to form collaborations with are NoCopyrightSounds, DanTDM and Dan Rhodes based on this analysis, because they attract the most engagement on their channels consistently.
+4. The top 3 channels to form collaborations with are Dan Rhodes, DanTDM and Mister Max based on this analysis, because they attract the most engagement on their channels consistently.
 
 
 ### Potential ROI 
 - What ROI do we expect if we take this course of action?
 
-1. Setting up a collaboration deal with Dan Rhodes would make the client a net profit of $1,065,000 per video
-2. An influencer marketing contract with Mister Max can see the client generate a net profit of $1,276,000
-3. If we go with a product placement campaign with DanTDM, this could  generate the client approximately $484,000 per video. If we advance with an influencer marketing campaign deal instead, this would make the client a one-off net profit of $404,000.
-4. NoCopyrightSounds could profit the client $642,000 per video too (which is worth considering) 
+1. Setting up a collaboration deal with Dan Rhodes would make the client a net profit of $1,082,000 per video
+2. An influencer marketing contract with Mister Max can see the client generate a net profit of $1,235,000
+3. If we go with a product placement campaign with DanTDM, this could generate the client approximately $487,000 per video. If we advance with an influencer marketing campaign deal instead, this would make the client a one-off net profit of $407,000.
+4. NoCopyrightSounds could profit the client $547,000 per video too (which is worth considering) 
 
 
 
@@ -816,12 +779,11 @@ We discovered that
 ### Action plan
 - What course of action should we take and why?
 
-Based on our analysis, we beieve the best channel to advance a long-term partnership deal with to promote the client's products is the Dan Rhodes channel. 
+Based on our analysis, we believe the best channel to advance a long-term partnership deal with to promote the client's products is the Dan Rhodes channel. 
 
 We'll have conversations with the marketing client to forecast what they also expect from this collaboration. Once we observe we're hitting the expected milestones, we'll advance with potential partnerships with DanTDM, Mister Max and NoCopyrightSounds channels in the future.   
 
 - What steps do we take to implement the recommended decisions effectively?
-
 
 1. Reach out to the teams behind each of these channels, starting with Dan Rhodes
 2. Negotiate contracts within the budgets allocated to each marketing campaign
@@ -829,3 +791,13 @@ We'll have conversations with the marketing client to forecast what they also ex
 4. Review how the campaigns have gone, gather insights and optimize based on feedback from converted customers and each channel's audiences 
 
 
+# Conclusion
+
+This analysis has provided valuable insights into the top UK YouTubers for 2024, enabling data-driven decisions for marketing campaign investments. The key takeaways are:
+
+- **Dan Rhodes** offers the best ROI for product placement campaigns
+- **Mister Max** maximizes reach for influencer marketing campaigns
+- **DanTDM** provides a solid balance of subscribers and engagement
+- Channels with the most videos uploaded may not always provide the best ROI
+
+By following the recommended action plan and starting with Dan Rhodes, the marketing team can strategically allocate their budget to maximize campaign effectiveness and profitability.
